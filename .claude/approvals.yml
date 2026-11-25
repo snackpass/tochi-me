@@ -1,0 +1,26 @@
+# .claude/approvals.yml
+version: 1
+rules:
+  - purpose: "A change takes two approvals from a colleague, strix-security[bot], snackpasscodegoblin[bot] or greptile-apps[bot]. When Claude's review passes, Claude approves and nobody else is needed."
+    paths: ["**"]
+    verdict:
+      claude: comments
+      seats:
+        - count: 2
+          from:
+            - humans
+            - "!pr/authors"
+            - "bot:strix-security"
+            - "bot:snackpasscodegoblin"
+            - "bot:greptile-apps"
+    override:
+      - if: "claude/code_review = pass"
+        verdict: { claude: approves, seats: 0 }
+  - purpose: "A bot's pull request always takes one colleague. Claude approves it only once its review passes."
+    paths: ["**"]
+    if: "pr/opened_by = bots"
+    verdict:
+      claude: approves
+      seats:
+        - count: 1
+          from: [humans, "!pr/authors"]
